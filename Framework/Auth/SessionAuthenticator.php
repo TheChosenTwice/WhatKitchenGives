@@ -3,6 +3,7 @@
 namespace Framework\Auth;
 
 use App\Configuration;
+use App\Models\User;
 use Framework\Core\App;
 use Framework\Core\IAuthenticator;
 use Framework\Core\IIdentity;
@@ -45,8 +46,17 @@ abstract class SessionAuthenticator implements IAuthenticator
     {
         $identity = $this->authenticate($username, $password);
         if ($identity instanceof IIdentity) {
-            // Store the entire User object in the session
-            $this->session->set(Configuration::IDENTITY_SESSION_KEY, $identity);
+            // Prefer storing only the user id in the session to avoid serializing full objects.
+            if ($identity instanceof User) {
+                $this->session->set(Configuration::IDENTITY_SESSION_KEY, (int)$identity->getId());
+            } else {
+                // Backward-compatible fallback (e.g., DummyUser)
+                $this->session->set(Configuration::IDENTITY_SESSION_KEY, $identity);
+            }
+
+            // Mitigate session fixation on privilege change
+            $this->session->regenerateId(true);
+
             return true;
         }
         elseif ($identity !== null) {
@@ -62,7 +72,11 @@ abstract class SessionAuthenticator implements IAuthenticator
      */
     public function logout(): void
     {
-        $this->session->destroy(); // Destroy the session to log out the user
+        // Remove only auth identity, don't destroy whole session (keeps other session data intact).
+        $this->session->remove(Configuration::IDENTITY_SESSION_KEY);
+
+        // Rotate the session id after logout as well.
+        $this->session->regenerateId(true);
     }
 
     /**
@@ -72,7 +86,17 @@ abstract class SessionAuthenticator implements IAuthenticator
      */
     public function getUser(): AppUser
     {
-        $identity = $this->session->get(Configuration::IDENTITY_SESSION_KEY);
+        $stored = $this->session->get(Configuration::IDENTITY_SESSION_KEY);
+
+        // New behavior: stored user id
+        if (is_int($stored) || (is_string($stored) && ctype_digit($stored))) {
+            $userId = (int)$stored;
+            $identity = $userId > 0 ? User::getOne($userId) : null;
+            return new AppUser($identity);
+        }
+
+        // Backward compatibility: stored identity object
+        $identity = $stored;
         if ($identity !== null && !($identity instanceof IIdentity)) {
             throw new \RuntimeException('Stored identity must implement IIdentity interface.');
         }
@@ -80,3 +104,4 @@ abstract class SessionAuthenticator implements IAuthenticator
     }
 
 }
+

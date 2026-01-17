@@ -128,4 +128,14 @@ class Session
         }
         return session_destroy();
     }
+
+    /**
+     * Regenerates the session ID.
+     *
+     * Use after login/logout to mitigate session fixation.
+     */
+    public function regenerateId(bool $deleteOldSession = true): bool
+    {
+        return session_regenerate_id($deleteOldSession);
+    }
 }
