@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Configuration;
+use App\Models\User;
 use Exception;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
@@ -54,6 +55,14 @@ class AuthController extends BaseController
         }
 
         $message = $logged === false ? 'Bad username or password' : null;
+
+        // Check for flash message from registration
+        $flash = $this->app->getSession()->get('flash.register_success');
+        if ($flash) {
+            $message = $flash;
+            $this->app->getSession()->remove('flash.register_success');
+        }
+
         return $this->html(compact("message"));
     }
 
@@ -75,7 +84,7 @@ class AuthController extends BaseController
      * Shows and processes the registration form.
      *
      * Basic validation is performed (required username/password and password confirmation). On successful registration
-     * the user is redirected back to the login view. Persisting the user is left as a tdo.
+     * the user is redirected back to the login view.
      */
     public function register(Request $request): Response
     {
@@ -83,6 +92,7 @@ class AuthController extends BaseController
 
         if ($request->hasValue('submit')) {
             $username = trim((string)$request->value('username'));
+            $email = trim((string)$request->value('email')) ?: null;
             $password = (string)$request->value('password');
             $passwordConfirm = (string)$request->value('password_confirm');
 
@@ -96,7 +106,22 @@ class AuthController extends BaseController
                 return $this->html(compact('message'));
             }
 
-            // Persist the new user (database, model, etc.). For now, assume registration succeeded.
+            // Basic uniqueness check
+            $existing = User::getCount('username = ?', [$username]);
+            if ($existing > 0) {
+                $message = 'Username already taken';
+                return $this->html(compact('message'));
+            }
+
+            // Create and persist user
+            $user = new User();
+            $user->setUsername($username);
+            $user->setEmail($email);
+            $user->setPassword($password);
+            $user->save();
+
+            // Set flash message and redirect to login
+            $this->app->getSession()->set('flash.register_success', 'Registration successful. Please log in.');
             return $this->redirect($this->url('login'));
         }
 
