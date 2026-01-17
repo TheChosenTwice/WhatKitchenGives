@@ -23,13 +23,15 @@
     <section class="home-page__ingredients" id="all-ingredients" aria-label="Ingredients">
         <div class="home-page__ingredients-layout">
             <div class="home-page__ingredients-left" aria-label="All ingredients">
-                <ul class="ingredients-grid list-unstyled">
-                    <?php
-                    $ingredients = [
+                <?php
+                $pools = [
+                    'Fruits' => [
                         'Apples',
                         'Pears',
                         'Bananas',
                         'Lemons',
+                    ],
+                    'Vegetables' => [
                         'Tomatoes',
                         'Potatoes',
                         'Onions',
@@ -42,18 +44,24 @@
                         'Zucchini',
                         'Cucumber',
                         'Salad / Lettuce',
+                    ],
+                    'Dairy & Eggs' => [
                         'Eggs',
                         'Milk',
                         'Butter',
                         'Cheddar Cheese',
                         'Cream Cheese',
                         'Yogurt',
+                    ],
+                    'Meat & Fish' => [
                         'Chicken Breast',
                         'Chicken (in General)',
                         'Ground Beef',
                         'Pork',
                         'Fish (in General)',
                         'Bacon',
+                    ],
+                    'Pantry / Baking / Spices & Condiments' => [
                         'Flour',
                         'Sugar',
                         'Brown Sugar',
@@ -83,30 +91,38 @@
                         'Cinnamon',
                         'Garlic Powder',
                         'Onion Powder',
-                    ];
+                    ],
+                ];
 
-                    // Alphabetical (case-insensitive) sort; reindex so ids stay sequential after sorting.
-                    natcasesort($ingredients);
-                    $ingredients = array_values($ingredients);
+                // Sort each pool alphabetically for nicer scanning.
+                foreach ($pools as $poolName => $items) {
+                    natcasesort($items);
+                    $pools[$poolName] = array_values($items);
+                }
+                ?>
 
-                    foreach ($ingredients as $i => $name) {
-                        $safeName = htmlspecialchars($name, ENT_QUOTES);
-                        ?>
-                        <li class="ingredients-grid__item">
-                            <button
-                                type="button"
-                                class="ingredient-chip"
-                                data-ingredient-chip
-                                data-ingredient-name="<?= $safeName ?>"
-                                aria-pressed="false"
-                            >
-                                <?= htmlspecialchars($name) ?>
-                            </button>
-                        </li>
-                        <?php
-                    }
-                    ?>
-                </ul>
+                <?php foreach ($pools as $poolName => $items) { ?>
+                    <section class="ingredient-pool" aria-label="<?= htmlspecialchars($poolName) ?>">
+                        <h2 class="ingredient-pool__title"><?= htmlspecialchars($poolName) ?></h2>
+                        <ul class="ingredients-grid list-unstyled">
+                            <?php foreach ($items as $name) {
+                                $safeName = htmlspecialchars($name, ENT_QUOTES);
+                                ?>
+                                <li class="ingredients-grid__item">
+                                    <button
+                                        type="button"
+                                        class="ingredient-chip"
+                                        data-ingredient-chip
+                                        data-ingredient-name="<?= $safeName ?>"
+                                        aria-pressed="false"
+                                    >
+                                        <?= htmlspecialchars($name) ?>
+                                    </button>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </section>
+                <?php } ?>
             </div>
 
             <aside class="home-page__ingredients-right" aria-label="Selected ingredients">
