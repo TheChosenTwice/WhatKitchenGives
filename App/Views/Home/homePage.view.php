@@ -13,9 +13,6 @@
         <div class="home-page__section-label" style="font-weight:700; letter-spacing:.5px;">
             QUICK KITCHEN
         </div>
-        <a class="home-page__all-link text-decoration-none" href="#all-ingredients" style="color:#222; font-weight:600;">
-            Click Here For All Ingredients
-        </a>
     </section>
 
     <hr class="home-page__divider" style="border:0; border-top:2px solid #ee7f2d; opacity:1;" />

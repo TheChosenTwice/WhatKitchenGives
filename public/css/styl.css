@@ -184,3 +184,19 @@
     outline: 0;
     box-shadow: 0 0 0 3px rgba(133, 184, 107, 0.35);
 }
+
+/* Scrollable ingredients list (left side only) */
+.home-page__ingredients-left {
+    /* Keep the selected ingredients box visible; scroll only the list column */
+    max-height: calc(100vh - 240px);
+    overflow: auto;
+    padding-right: 10px; /* room for scrollbar */
+}
+
+@media (max-width: 992px) {
+    .home-page__ingredients-left {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+    }
+}
