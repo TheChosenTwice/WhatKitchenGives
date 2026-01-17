@@ -5,3 +5,87 @@
 .navbar-brand img {
     width: 50px;
 }
+
+/* Two-column layout: ingredients (left) + selected rectangle (right) */
+.home-page__ingredients-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 992px) {
+    .home-page__ingredients-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.selected-ingredients {
+    border: 2px solid #ee7f2d;
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: #fff;
+}
+
+.selected-ingredients__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.selected-ingredients__title {
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+.selected-ingredients__count {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.selected-ingredients__item {
+    padding: 4px 0;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+}
+
+.selected-ingredients__item:last-child {
+    border-bottom: 0;
+}
+
+/* Home page - responsive ingredients layout (max 3 columns: 3 -> 2 -> 1)
+   Note: CSS Grid flows row-by-row by default, so A..Z reads left-to-right then next row. */
+.ingredients-grid {
+    --min-col: 240px;
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 48px;
+    row-gap: 12px;
+
+    padding-left: 0;
+    margin: 0;
+}
+
+.ingredients-grid__item {
+    padding: 6px 0;
+    min-width: 0;
+}
+
+/* If 3 columns don't fit, use 2 */
+@media (max-width: 992px) {
+    .ingredients-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 32px;
+    }
+}
+
+/* If 2 columns don't fit, use 1 */
+@media (max-width: 576px) {
+    .ingredients-grid {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+    }
+}
