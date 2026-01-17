@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Framework\Core\IIdentity;
 use Framework\Core\Model;
 
-class User extends Model
+class User extends Model implements IIdentity
 {
     // DB columns must match these protected properties
     protected ?int $id = null;
@@ -50,9 +51,16 @@ class User extends Model
         $this->password_hash = password_hash($plain, PASSWORD_DEFAULT);
     }
 
+    /**
+     * Identity display name used by the framework.
+     */
+    public function getName(): string
+    {
+        return $this->username;
+    }
+
     public function getCreatedAt(): ?string
     {
         return $this->created_at;
     }
 }
-
