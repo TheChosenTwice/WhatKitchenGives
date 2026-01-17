@@ -90,14 +90,18 @@
                     $ingredients = array_values($ingredients);
 
                     foreach ($ingredients as $i => $name) {
-                        $id = 'ing_' . $i;
+                        $safeName = htmlspecialchars($name, ENT_QUOTES);
                         ?>
                         <li class="ingredients-grid__item">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="<?= $id ?>" name="ingredients[]"
-                                       value="<?= htmlspecialchars($name, ENT_QUOTES) ?>" data-ingredient-name="<?= htmlspecialchars($name, ENT_QUOTES) ?>">
-                                <label class="form-check-label" for="<?= $id ?>"><?= htmlspecialchars($name) ?></label>
-                            </div>
+                            <button
+                                type="button"
+                                class="ingredient-chip"
+                                data-ingredient-chip
+                                data-ingredient-name="<?= $safeName ?>"
+                                aria-pressed="false"
+                            >
+                                <?= htmlspecialchars($name) ?>
+                            </button>
                         </li>
                         <?php
                     }
@@ -128,15 +132,25 @@
             const container = document.querySelector('.home-page__ingredients');
             if (!container) return;
 
-            const checkboxes = Array.from(container.querySelectorAll('input[type="checkbox"][name="ingredients[]"]'));
+            const chips = Array.from(container.querySelectorAll('[data-ingredient-chip]'));
             const listEl = document.getElementById('selectedIngredientsList');
             const countEl = document.getElementById('selectedIngredientsCount');
             const clearBtn = document.getElementById('selectedIngredientsClear');
 
+            function isPressed(chip) {
+                return chip.getAttribute('aria-pressed') === 'true';
+            }
+
+            function setPressed(chip, pressed) {
+                chip.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+                chip.classList.toggle('is-selected', pressed);
+            }
+
             function getSelectedNames() {
-                return checkboxes
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.getAttribute('data-ingredient-name') || cb.value)
+                return chips
+                    .filter(isPressed)
+                    .map(chip => chip.getAttribute('data-ingredient-name') || chip.textContent.trim())
+                    .filter(Boolean)
                     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
             }
 
@@ -155,10 +169,27 @@
                 }
             }
 
-            checkboxes.forEach(cb => cb.addEventListener('change', renderSelected));
+            function toggleChip(chip) {
+                setPressed(chip, !isPressed(chip));
+                renderSelected();
+            }
+
+            chips.forEach(chip => {
+                // Ensure initial style matches aria-pressed
+                setPressed(chip, isPressed(chip));
+
+                chip.addEventListener('click', () => toggleChip(chip));
+                chip.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleChip(chip);
+                    }
+                });
+            });
+
             if (clearBtn) {
                 clearBtn.addEventListener('click', () => {
-                    checkboxes.forEach(cb => { cb.checked = false; });
+                    chips.forEach(chip => setPressed(chip, false));
                     renderSelected();
                 });
             }
