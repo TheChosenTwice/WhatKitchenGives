@@ -1,5 +1,41 @@
 .navbar {
     border-bottom: 1px solid grey;
+    background: #fff !important; /* ensure white even with Bootstrap bg-light */
+}
+
+.navbar .nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 12px;
+    margin: 0 6px;
+
+    border: 2px solid #85b86b;
+    border-radius: 10px;
+
+    color: #222;
+    font-weight: 700;
+
+    background: transparent;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    background: rgba(133, 184, 107, 0.12);
+    color: #222;
+    text-decoration: none;
+}
+
+.navbar .nav-link.active {
+    background: #85b86b;
+    color: #fff;
+}
+
+/* Keep the brand/logo unframed */
+.navbar .navbar-brand {
+    padding: 0;
+    margin-right: 12px;
 }
 
 .navbar-brand img {
