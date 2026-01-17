@@ -101,14 +101,33 @@
                 }
                 ?>
 
-                <?php foreach ($pools as $poolName => $items) { ?>
-                    <section class="ingredient-pool" aria-label="<?= htmlspecialchars($poolName) ?>">
-                        <h2 class="ingredient-pool__title"><?= htmlspecialchars($poolName) ?></h2>
-                        <ul class="ingredients-grid list-unstyled">
-                            <?php foreach ($items as $name) {
+                <?php foreach ($pools as $poolName => $items) {
+                    $poolId = 'pool_' . preg_replace('/[^a-z0-9]+/i', '_', strtolower($poolName));
+                    $visibleCount = 9;
+                    ?>
+                    <section class="ingredient-pool" aria-label="<?= htmlspecialchars($poolName) ?>" data-ingredient-pool>
+                        <div class="ingredient-pool__header">
+                            <h2 class="ingredient-pool__title" id="<?= $poolId ?>_title"><?= htmlspecialchars($poolName) ?></h2>
+
+                            <?php if (count($items) > $visibleCount) { ?>
+                                <button
+                                    type="button"
+                                    class="ingredient-pool__toggle"
+                                    data-pool-toggle
+                                    aria-expanded="false"
+                                    aria-controls="<?= $poolId ?>_grid"
+                                >
+                                    +<?= (count($items) - $visibleCount) ?> more
+                                </button>
+                            <?php } ?>
+                        </div>
+
+                        <ul class="ingredients-grid list-unstyled" id="<?= $poolId ?>_grid">
+                            <?php foreach ($items as $idx => $name) {
                                 $safeName = htmlspecialchars($name, ENT_QUOTES);
+                                $isHidden = $idx >= $visibleCount;
                                 ?>
-                                <li class="ingredients-grid__item">
+                                <li class="ingredients-grid__item" <?= $isHidden ? 'data-pool-hidden hidden' : '' ?>>
                                     <button
                                         type="button"
                                         class="ingredient-chip"
@@ -200,6 +219,24 @@
                         e.preventDefault();
                         toggleChip(chip);
                     }
+                });
+            });
+
+            // Pool expand/collapse
+            container.querySelectorAll('[data-pool-toggle]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const expanded = btn.getAttribute('aria-expanded') === 'true';
+                    const pool = btn.closest('[data-ingredient-pool]');
+                    if (!pool) return;
+
+                    pool.querySelectorAll('[data-pool-hidden]').forEach(li => {
+                        li.hidden = expanded; // currently expanded -> collapse to hidden
+                    });
+
+                    btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+
+                    const hiddenCount = pool.querySelectorAll('[data-pool-hidden]').length;
+                    btn.textContent = expanded ? `+${hiddenCount} more` : 'Show less';
                 });
             });
 
