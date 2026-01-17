@@ -33,6 +33,10 @@ $view->setLayout('auth');
                             </button>
                         </div>
                     </form>
+
+                    <div class="text-center mt-3">
+                        <a href="<?= $link->url("register") ?>" class="btn btn-link">Create new account</a>
+                    </div>
                 </div>
             </div>
         </div>

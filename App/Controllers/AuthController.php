@@ -70,4 +70,36 @@ class AuthController extends BaseController
         $this->app->getAuthenticator()->logout();
         return $this->html();
     }
+
+    /**
+     * Shows and processes the registration form.
+     *
+     * Basic validation is performed (required username/password and password confirmation). On successful registration
+     * the user is redirected back to the login view. Persisting the user is left as a tdo.
+     */
+    public function register(Request $request): Response
+    {
+        $message = null;
+
+        if ($request->hasValue('submit')) {
+            $username = trim((string)$request->value('username'));
+            $password = (string)$request->value('password');
+            $passwordConfirm = (string)$request->value('password_confirm');
+
+            if ($username === '' || $password === '') {
+                $message = 'Username and password are required';
+                return $this->html(compact('message'));
+            }
+
+            if ($password !== $passwordConfirm) {
+                $message = 'Passwords do not match';
+                return $this->html(compact('message'));
+            }
+
+            // Persist the new user (database, model, etc.). For now, assume registration succeeded.
+            return $this->redirect($this->url('login'));
+        }
+
+        return $this->html(compact('message'));
+    }
 }
