@@ -163,7 +163,7 @@ use Framework\Support\LinkGenerator;
                             type="button"
                             class="btn btn-warning w-100"
                             id="findRecipesBtn"
-                            data-find-recipes-url="<?= $link->url('home.index') ?>"
+                            data-find-recipes-url="<?= $link->url('home.recipesRanked') ?>"
                             disabled
                         >
                             Find Recipes

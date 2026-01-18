@@ -2,6 +2,9 @@
 
 namespace App\Controllers;
 
+use App\Models\Ingredient;
+use App\Models\Recipe;
+use Exception;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
 use Framework\Http\Responses\Response;
@@ -58,5 +61,32 @@ class HomeController extends BaseController
     public function homePage(): Response
     {
         return $this->html();
+    }
+
+    /**
+     * Shows recipes ranked by how many selected ingredients they match.
+     *
+     * Expected query params:
+     * - ingredient_names: comma-separated ingredient names (as used on the home page)
+     */
+    public function recipesRanked(Request $request): Response
+    {
+        $ingredientNamesRaw = (string)($request->get('ingredient_names') ?? '');
+        $ingredientNames = array_values(array_filter(array_map('trim', explode(',', $ingredientNamesRaw)), fn($v) => $v !== ''));
+
+        // Resolve names -> ids using DB; unknown names are ignored.
+        $ingredientIds = [];
+        if (!empty($ingredientNames)) {
+            $placeholders = implode(',', array_fill(0, count($ingredientNames), '?'));
+            $rows = Ingredient::executeRawSQL(
+                "SELECT `id` FROM `ingredients` WHERE `name` IN ($placeholders)",
+                $ingredientNames
+            );
+            $ingredientIds = array_values(array_map(static fn($r) => (int)$r['id'], $rows));
+        }
+
+        $recipes = Recipe::findRankedByIngredientIds($ingredientIds, 60, 0);
+
+        return $this->html(compact('recipes', 'ingredientIds'));
     }
 }

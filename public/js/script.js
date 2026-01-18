@@ -95,9 +95,14 @@
 
     if (findRecipesBtn) {
       findRecipesBtn.addEventListener('click', () => {
-        // The target view/route will be implemented later.
-        const url = findRecipesBtn.getAttribute('data-find-recipes-url') || '?';
-        window.location.assign(url);
+        // Send selected ingredient names. Server resolves name -> id.
+        const baseUrl = findRecipesBtn.getAttribute('data-find-recipes-url') || '?';
+        const selected = getSelectedNames();
+
+        const url = new URL(baseUrl, window.location.href);
+        url.searchParams.set('ingredient_names', selected.join(','));
+
+        window.location.assign(url.toString());
       });
     }
 
