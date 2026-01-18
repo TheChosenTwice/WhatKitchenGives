@@ -1,8 +1,19 @@
 <?php
 /** @var LinkGenerator $link */
 
+use App\Models\Ingredient;
 use Framework\Support\LinkGenerator;
 
+// Load ingredient IDs for all ingredient names used on this page.
+$ingredientIdByName = [];
+try {
+    $rows = Ingredient::executeRawSQL('SELECT `id`, `name` FROM `ingredients`');
+    foreach ($rows as $r) {
+        $ingredientIdByName[(string)$r['name']] = (int)$r['id'];
+    }
+} catch (\Throwable) {
+    // If DB is not available yet (e.g., before migrations), keep IDs empty.
+}
 ?>
 
 <main class="home-page container-fluid">
@@ -126,6 +137,7 @@ use Framework\Support\LinkGenerator;
                             <?php foreach ($items as $idx => $name) {
                                 $safeName = htmlspecialchars($name, ENT_QUOTES);
                                 $isHidden = $idx >= $visibleCount;
+                                $ingredientId = $ingredientIdByName[$name] ?? null;
                                 ?>
                                 <li class="ingredients-grid__item" <?= $isHidden ? 'data-pool-hidden hidden' : '' ?>>
                                     <button
@@ -133,6 +145,7 @@ use Framework\Support\LinkGenerator;
                                         class="ingredient-chip"
                                         data-ingredient-chip
                                         data-ingredient-name="<?= $safeName ?>"
+                                        <?= $ingredientId !== null ? 'data-ingredient-id="' . (int)$ingredientId . '"' : '' ?>
                                         aria-pressed="false"
                                     >
                                         <?= htmlspecialchars($name) ?>

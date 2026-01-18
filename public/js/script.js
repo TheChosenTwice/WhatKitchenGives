@@ -31,6 +31,18 @@
         .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
     }
 
+    function getSelectedIds() {
+      return chips
+        .filter(isPressed)
+        .map((chip) => {
+          const v = chip.getAttribute('data-ingredient-id');
+          if (!v) return null;
+          const n = Number(v);
+          return Number.isFinite(n) && n > 0 ? Math.trunc(n) : null;
+        })
+        .filter((v) => v !== null);
+    }
+
     function renderSelected() {
       if (!listEl || !countEl) return;
 
@@ -95,12 +107,19 @@
 
     if (findRecipesBtn) {
       findRecipesBtn.addEventListener('click', () => {
-        // Send selected ingredient names. Server resolves name -> id.
         const baseUrl = findRecipesBtn.getAttribute('data-find-recipes-url') || '?';
-        const selected = getSelectedNames();
+
+        const ids = getSelectedIds();
+        const names = getSelectedNames();
 
         const url = new URL(baseUrl, window.location.href);
-        url.searchParams.set('ingredient_names', selected.join(','));
+
+        // Prefer IDs. If IDs are not available (e.g., DB not migrated), fall back to names.
+        if (ids.length > 0) {
+          ids.forEach((id) => url.searchParams.append('ingredient_ids[]', String(id)));
+        } else {
+          url.searchParams.set('ingredient_names', names.join(','));
+        }
 
         window.location.assign(url.toString());
       });

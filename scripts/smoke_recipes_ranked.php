@@ -6,18 +6,19 @@
 
 require_once __DIR__ . '/../Framework/ClassLoader.php';
 
+use App\Models\Ingredient;
 use App\Models\Recipe;
 
-// Example ingredient ids (adjust to your DB contents)
-$ingredientIds = [
-    1,
-    2,
-    3,
-];
+$exampleNames = ['Eggs', 'Milk', 'Tomatoes'];
+$placeholders = implode(',', array_fill(0, count($exampleNames), '?'));
+$rows = Ingredient::executeRawSQL("SELECT `id`, `name` FROM `ingredients` WHERE `name` IN ($placeholders)", $exampleNames);
 
-$rows = Recipe::findRankedByIngredientIds($ingredientIds, 20, 0);
+$ingredientIds = array_values(array_map(static fn($r) => (int)$r['id'], $rows));
 
-echo "Found " . count($rows) . " recipes\n";
-foreach ($rows as $r) {
+$recipes = Recipe::findRankedByIngredientIds($ingredientIds, 20, 0);
+
+echo "Selected ingredient IDs: " . implode(',', $ingredientIds) . "\n";
+echo "Found " . count($recipes) . " recipes\n";
+foreach ($recipes as $r) {
     echo "- {$r['title']} (match {$r['match_count']}/{$r['total_ingredients']}, missing {$r['missing_count']})\n";
 }

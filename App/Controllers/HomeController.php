@@ -67,22 +67,46 @@ class HomeController extends BaseController
      * Shows recipes ranked by how many selected ingredients they match.
      *
      * Expected query params:
-     * - ingredient_names: comma-separated ingredient names (as used on the home page)
+     * - ingredient_ids[]: repeated ingredient IDs
+     * Optionally supported (fallback):
+     * - ingredient_names: comma-separated ingredient names
      */
     public function recipesRanked(Request $request): Response
     {
-        $ingredientNamesRaw = (string)($request->get('ingredient_names') ?? '');
-        $ingredientNames = array_values(array_filter(array_map('trim', explode(',', $ingredientNamesRaw)), fn($v) => $v !== ''));
+        $rawIds = $request->get('ingredient_ids');
 
-        // Resolve names -> ids using DB; unknown names are ignored.
+        // Some PHP setups may provide ingredient_ids[] as 'ingredient_ids' or 'ingredient_ids[]'.
+        if ($rawIds === null) {
+            $rawIds = $request->get('ingredient_ids[]');
+        }
+
         $ingredientIds = [];
-        if (!empty($ingredientNames)) {
-            $placeholders = implode(',', array_fill(0, count($ingredientNames), '?'));
-            $rows = Ingredient::executeRawSQL(
-                "SELECT `id` FROM `ingredients` WHERE `name` IN ($placeholders)",
-                $ingredientNames
-            );
-            $ingredientIds = array_values(array_map(static fn($r) => (int)$r['id'], $rows));
+        if (is_array($rawIds)) {
+            $ingredientIds = array_values(array_unique(array_filter(array_map(
+                static fn($v) => is_numeric($v) ? (int)$v : null,
+                $rawIds
+            ), static fn($v) => is_int($v) && $v > 0)));
+        } elseif ($rawIds !== null && $rawIds !== '') {
+            // If someone passes a comma-separated string
+            $ingredientIds = array_values(array_unique(array_filter(array_map(
+                static fn($v) => is_numeric($v) ? (int)$v : null,
+                explode(',', (string)$rawIds)
+            ), static fn($v) => is_int($v) && $v > 0)));
+        }
+
+        // Backward-compatible fallback: resolve names -> ids.
+        if (empty($ingredientIds)) {
+            $ingredientNamesRaw = (string)($request->get('ingredient_names') ?? '');
+            $ingredientNames = array_values(array_filter(array_map('trim', explode(',', $ingredientNamesRaw)), fn($v) => $v !== ''));
+
+            if (!empty($ingredientNames)) {
+                $placeholders = implode(',', array_fill(0, count($ingredientNames), '?'));
+                $rows = Ingredient::executeRawSQL(
+                    "SELECT `id` FROM `ingredients` WHERE `name` IN ($placeholders)",
+                    $ingredientNames
+                );
+                $ingredientIds = array_values(array_map(static fn($r) => (int)$r['id'], $rows));
+            }
         }
 
         $recipes = Recipe::findRankedByIngredientIds($ingredientIds, 60, 0);
