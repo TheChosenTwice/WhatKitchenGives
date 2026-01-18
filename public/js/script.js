@@ -12,6 +12,7 @@
     const listEl = document.getElementById('selectedIngredientsList');
     const countEl = document.getElementById('selectedIngredientsCount');
     const clearBtn = document.getElementById('selectedIngredientsClear');
+    const findRecipesBtn = document.getElementById('findRecipesBtn');
 
     function isPressed(chip) {
       return chip.getAttribute('aria-pressed') === 'true';
@@ -35,6 +36,10 @@
 
       const selected = getSelectedNames();
       countEl.textContent = `${selected.length} selected`;
+
+      if (findRecipesBtn) {
+        findRecipesBtn.disabled = selected.length === 0;
+      }
 
       listEl.innerHTML = '';
       for (const name of selected) {
@@ -85,6 +90,14 @@
       clearBtn.addEventListener('click', () => {
         chips.forEach((chip) => setPressed(chip, false));
         renderSelected();
+      });
+    }
+
+    if (findRecipesBtn) {
+      findRecipesBtn.addEventListener('click', () => {
+        // The target view/route will be implemented later.
+        const url = findRecipesBtn.getAttribute('data-find-recipes-url') || '?';
+        window.location.assign(url);
       });
     }
 

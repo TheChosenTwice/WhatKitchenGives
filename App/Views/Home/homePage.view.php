@@ -1,16 +1,19 @@
 <?php
-/** @var \Framework\Support\LinkGenerator $link */
+/** @var LinkGenerator $link */
+
+use Framework\Support\LinkGenerator;
+
 ?>
 
 <main class="home-page container-fluid">
     <header class="home-page__header text-center mt-3">
-        <h1 class="home-page__title" style="color:#85b86b; font-weight:700; letter-spacing:.5px;">
+        <h1 class="home-page__title" style="color:#85b86b; font-weight:700; letter-spacing:1px;">
             WHAT'S IN YOUR FRIDGE?
         </h1>
     </header>
 
     <section class="home-page__controls d-flex align-items-center justify-content-between mt-3">
-        <div class="home-page__section-label" style="font-weight:700; letter-spacing:.5px;">
+        <div class="home-page__section-label" style="font-weight:700; letter-spacing:1px;">
             QUICK KITCHEN
         </div>
     </section>
@@ -154,6 +157,18 @@
                     <ul class="selected-ingredients__list list-unstyled" id="selectedIngredientsList">
                         <!-- populated by JS -->
                     </ul>
+
+                    <div class="selected-ingredients__actions mt-3">
+                        <button
+                            type="button"
+                            class="btn btn-warning w-100"
+                            id="findRecipesBtn"
+                            data-find-recipes-url="<?= $link->url('home.index') ?>"
+                            disabled
+                        >
+                            Find Recipes
+                        </button>
+                    </div>
                 </div>
             </aside>
         </div>
