@@ -120,7 +120,7 @@
                                                     $category = method_exists($r, 'getCategory') ? $r->getCategory() : '';
                                                     $time = method_exists($r, 'getCookingTime') ? $r->getCookingTime() : null;
                                                 ?>
-                                                    <tr>
+                                                    <tr data-id="<?= (int)$id ?>" data-title="<?= htmlspecialchars((string)$title, ENT_QUOTES) ?>" data-category="<?= htmlspecialchars((string)$category, ENT_QUOTES) ?>" data-time="<?= $time !== null ? (int)$time : '' ?>" data-serving="<?= method_exists($r,'getServingSize') && $r->getServingSize() !== null ? (int)$r->getServingSize() : '' ?>" data-image="<?= htmlspecialchars((string)(method_exists($r,'getImage') ? $r->getImage() : ''), ENT_QUOTES) ?>" data-instructions="<?= htmlspecialchars((string)(method_exists($r,'getInstructions') ? $r->getInstructions() : ''), ENT_QUOTES) ?>">
                                                         <td><?= htmlspecialchars((int)$id) ?></td>
                                                         <td><?= htmlspecialchars((string)$title) ?></td>
                                                         <td><?= htmlspecialchars((string)$category) ?></td>
@@ -227,7 +227,7 @@
                                                     $iname = method_exists($ing, 'getName') ? $ing->getName() : '';
                                                     $icategory = method_exists($ing, 'getCategory') ? $ing->getCategory() : '';
                                                 ?>
-                                                    <tr>
+                                                    <tr data-id="<?= (int)$iid ?>" data-name="<?= htmlspecialchars((string)$iname, ENT_QUOTES) ?>" data-category="<?= htmlspecialchars((string)$icategory, ENT_QUOTES) ?>">
                                                         <td><?= htmlspecialchars((int)$iid) ?></td>
                                                         <td><?= htmlspecialchars((string)$iname) ?></td>
                                                         <td><?= htmlspecialchars((string)$icategory) ?></td>
@@ -420,7 +420,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             var deleteUrl = '<?= $link->url("admin.delete") ?>';
             document.querySelectorAll('button.admin-delete').forEach(function (btn) {
-                btn.addEventListener('click', function () {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
                     var type = btn.getAttribute('data-type');
                     var id = parseInt(btn.getAttribute('data-id'), 10);
                     if (!type || !isFinite(id) || id <= 0) return alert('Invalid item');
@@ -431,6 +432,109 @@
                         .then(j => {
                             if (j && j.success) { btn.closest('tr')?.remove(); } else { alert(j?.error || 'Failed to delete'); btn.disabled = false; }
                         }).catch(function () { alert('Network error'); btn.disabled = false; });
+                });
+            });
+
+            // Row selection: fill edit panels; clicking an already-selected row clears selection and empties the panel
+            document.querySelectorAll('table tbody tr').forEach(function (tr) {
+                tr.addEventListener('click', function () {
+                    // If this row is already active -> deselect and clear panel
+                    if (tr.classList.contains('table-active')) {
+                        tr.classList.remove('table-active');
+
+                        // Clear recipes panel
+                        if (tr.closest('#recipes')) {
+                            let rt = document.getElementById('recipe-title');
+                            if (rt) rt.value = '';
+                            let rc = document.getElementById('recipe-category'); if (rc) rc.value = '';
+                            let ri = document.getElementById('recipe-instructions'); if (ri) ri.value = '';
+                            let rp = document.getElementById('recipe-preptime'); if (rp) rp.value = '';
+                            let rs = document.getElementById('recipe-serving-size'); if (rs) rs.value = '';
+                            let rim = document.getElementById('recipe-image'); if (rim) rim.value = '';
+                            let rimPrev = document.getElementById('recipe-image-preview'); if (rimPrev) { rimPrev.style.display = 'none'; rimPrev.removeAttribute('src'); }
+                            return;
+                        }
+
+                        // Clear ingredients panel
+                        if (tr.closest('#ingredients')) {
+                            let iname = document.getElementById('ingredient-name'); if (iname) iname.value = '';
+                            let icat = document.getElementById('ingredient-category'); if (icat) icat.selectedIndex = 0;
+                            return;
+                        }
+
+                        // Clear users panel
+                        if (tr.closest('#users')) {
+                            let un = document.getElementById('user-username'); if (un) un.value = '';
+                            let ue = document.getElementById('user-email'); if (ue) ue.value = '';
+                            let ur = document.getElementById('user-role'); if (ur) ur.value = 'USER';
+                            let upw = document.getElementById('user-password'); if (upw) upw.value = '';
+                            return;
+                        }
+                    }
+
+                    // Recipes selection
+                    if (tr.closest('#recipes')) {
+                        let rid = tr.getAttribute('data-id');
+                        if (!rid) return;
+                        let title = tr.getAttribute('data-title') || '';
+                        let category = tr.getAttribute('data-category') || '';
+                        let time = tr.getAttribute('data-time') || '';
+                        let serving = tr.getAttribute('data-serving') || '';
+                        let image = tr.getAttribute('data-image') || '';
+                        let instructions = tr.getAttribute('data-instructions') || '';
+
+                        let rt = document.getElementById('recipe-title'); if (rt) rt.value = title;
+                        let rc = document.getElementById('recipe-category'); if (rc) rc.value = category;
+                        let ri = document.getElementById('recipe-instructions'); if (ri) ri.value = instructions;
+                        let rp = document.getElementById('recipe-preptime'); if (rp) rp.value = time;
+                        let rs = document.getElementById('recipe-serving-size'); if (rs) rs.value = serving;
+                        let rim = document.getElementById('recipe-image'); if (rim) rim.value = image;
+
+                        let recipesTab = document.getElementById('recipes-tab');
+                        if (recipesTab && recipesTab.classList.contains('active') === false) recipesTab.click();
+                        document.querySelectorAll('#recipes tbody tr').forEach(r => r.classList.remove('table-active'));
+                        tr.classList.add('table-active');
+                        return;
+                    }
+
+                    // Ingredients
+                    if (tr.closest('#ingredients')) {
+                        let iid = tr.getAttribute('data-id');
+                        if (!iid) return;
+                        let iname = tr.getAttribute('data-name') || '';
+                        let icat = tr.getAttribute('data-category') || '';
+
+                        let inameEl = document.getElementById('ingredient-name'); if (inameEl) inameEl.value = iname;
+                        let select = document.getElementById('ingredient-category');
+                        if (select) {
+                            for (let i = 0; i < select.options.length; i++) {
+                                if (select.options[i].text === icat) { select.selectedIndex = i; break; }
+                            }
+                        }
+                        let ingTab = document.getElementById('ingredients-tab');
+                        if (ingTab && ingTab.classList.contains('active') === false) ingTab.click();
+                        document.querySelectorAll('#ingredients tbody tr').forEach(r => r.classList.remove('table-active'));
+                        tr.classList.add('table-active');
+                        return;
+                    }
+
+                    // Users
+                    if (tr.closest('#users')) {
+                        let uid = tr.getAttribute('data-user-id');
+                        if (!uid) return;
+                        let uname = tr.getAttribute('data-username') || '';
+                        let uemail = tr.getAttribute('data-email') || '';
+                        let urole = tr.getAttribute('data-role') || 'USER';
+
+                        let un = document.getElementById('user-username'); if (un) un.value = uname;
+                        let ue = document.getElementById('user-email'); if (ue) ue.value = uemail;
+                        let roleSelect = document.getElementById('user-role'); if (roleSelect) roleSelect.value = urole;
+
+                        let usersTab = document.getElementById('users-tab');
+                        if (usersTab && usersTab.classList.contains('active') === false) usersTab.click();
+                        document.querySelectorAll('#users tbody tr').forEach(r => r.classList.remove('table-active'));
+                        tr.classList.add('table-active');
+                    }
                 });
             });
         });
