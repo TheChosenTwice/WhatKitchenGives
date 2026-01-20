@@ -74,6 +74,9 @@ class AdminController extends BaseController
         // Fetch a page of ingredients ordered by id ascending for the admin list
         $ingredients = Ingredient::getAll(null, [], 'id ASC', 200, 0);
 
-        return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount', 'recipes', 'ingredients'));
+        // Fetch a page of users ordered by id ascending for the admin list
+        $users = User::getAll(null, [], 'id ASC', 200, 0);
+
+        return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount', 'recipes', 'ingredients', 'users'));
     }
 }

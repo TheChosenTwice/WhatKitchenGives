@@ -4,6 +4,7 @@
 /** @var \Framework\Auth\AppUser $user */
 /** @var \App\Models\Recipe[] $recipes */
 /** @var \App\Models\Ingredient[] $ingredients */
+/** @var \App\Models\User[] $users */
 
 ?>
 
@@ -114,9 +115,9 @@
                                                 ?>
                                                     <tr>
                                                         <td><?= htmlspecialchars((int)$id) ?></td>
-                                                        <td><?= htmlspecialchars($title) ?></td>
+                                                        <td><?= htmlspecialchars((string)$title) ?></td>
                                                         <td><?= htmlspecialchars((string)$category) ?></td>
-                                                        <td><?= $time !== null ? htmlspecialchars($time . ' min') : '' ?></td>
+                                                        <td><?= $time !== null ? htmlspecialchars((string)($time . ' min')) : '' ?></td>
                                                         <td>
                                                             <button class="btn btn-sm btn-outline-primary">Edit</button>
                                                             <button class="btn btn-sm btn-outline-danger">Delete</button>
@@ -190,7 +191,7 @@
                                                 ?>
                                                     <tr>
                                                         <td><?= htmlspecialchars((int)$iid) ?></td>
-                                                        <td><?= htmlspecialchars($iname) ?></td>
+                                                        <td><?= htmlspecialchars((string)$iname) ?></td>
                                                         <td>
                                                             <button class="btn btn-sm btn-outline-primary">Edit</button>
                                                             <button class="btn btn-sm btn-outline-danger">Delete</button>
@@ -228,12 +229,93 @@
                     </div>
                 </div>
 
-                <!-- Users Tab (placeholder to resolve header anchor) -->
+                <!-- Users Tab (two-column: list + Add/Edit panel) -->
                 <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
-                    <div class="card">
-                        <div class="card-header">Users</div>
-                        <div class="card-body">
-                            <p>Users management UI coming soon. This is a visual placeholder so the <code>#users</code> header link resolves.</p>
+                    <div class="row">
+                        <div class="col-lg-7 mb-3">
+                            <div id="all-users" class="card">
+                                <div class="card-header">All Users</div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Username</th>
+                                                <th>Email Address</th>
+                                                <th>Member Since</th>
+                                                <th>Role</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php if (!empty($users)) { ?>
+                                                <?php foreach ($users as $u) {
+                                                    $uid = method_exists($u, 'getId') ? $u->getId() : null;
+                                                    $uname = method_exists($u, 'getUsername') ? $u->getUsername() : (method_exists($u,'getName') ? $u->getName() : '');
+                                                    $uemail = method_exists($u, 'getEmail') ? $u->getEmail() : '';
+                                                    $ureg = method_exists($u, 'getCreatedAt') ? $u->getCreatedAt() : '';
+                                                    $urole = method_exists($u, 'getRole') ? $u->getRole() : 'USER';
+                                                ?>
+                                                    <tr
+                                                        data-user-id="<?= (int)$uid ?>"
+                                                        data-username="<?= htmlspecialchars((string)$uname, ENT_QUOTES) ?>"
+                                                        data-email="<?= htmlspecialchars((string)$uemail, ENT_QUOTES) ?>"
+                                                        data-role="<?= htmlspecialchars((string)$urole, ENT_QUOTES) ?>"
+                                                    >
+                                                        <td><?= htmlspecialchars((int)$uid) ?></td>
+                                                        <td><?= htmlspecialchars((string)$uname) ?></td>
+                                                        <td><?= htmlspecialchars((string)$uemail) ?></td>
+                                                        <td><?= $ureg ? htmlspecialchars((string)$ureg) : '' ?></td>
+                                                        <td><?= htmlspecialchars((string)$urole) ?></td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-outline-primary btn-edit-user">Edit</button>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-user">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                <?php } ?>
+                                            <?php } else { ?>
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">No users found.</td>
+                                                </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5 mb-3">
+                            <div id="add-user" class="card">
+                                <div class="card-header">Add / Edit User</div>
+                                <div class="card-body">
+                                    <form id="adminUserForm">
+                                        <div class="mb-2">
+                                            <label class="form-label" for="user-username">Username</label>
+                                            <input id="user-username" class="form-control" type="text" placeholder="Username">
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label" for="user-email">Email</label>
+                                            <input id="user-email" class="form-control" type="email" placeholder="Email address">
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label" for="user-role">Role</label>
+                                            <select id="user-role" class="form-select">
+                                                <option value="USER">User</option>
+                                                <option value="ADMIN">Admin</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label" for="user-password">Password</label>
+                                            <input id="user-password" class="form-control" type="password" placeholder="Password (leave empty to keep)">
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="button" class="btn btn-primary">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
