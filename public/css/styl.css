@@ -236,3 +236,12 @@
         padding-right: 0;
     }
 }
+
+/* Admin panel styles (migrated from App/Views/Admin/index.view.php) */
+.admin-header img { max-height:48px; }
+.admin-panel .card { box-shadow: none; }
+.admin-panel .card .card-header { font-weight:600; }
+.admin-panel .display-6 { font-size: 1.5rem; }
+
+/* Make the header area slightly darker to match */
+.admin-header { background: rgba(0,0,0,0.03); padding: 0.75rem; border-radius: 6px; }

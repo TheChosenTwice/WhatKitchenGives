@@ -20,6 +20,8 @@
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="<?= $link->asset('css/styl.css') ?>">
+    <?php // Cache-bust styl.css during development so updates are picked up immediately ?>
+    <link rel="stylesheet" href="<?= $link->asset('css/styl.css') ?>?v=<?= time() ?>">
     <script src="<?= $link->asset('js/script.js') ?>"></script>
 </head>
 <body>

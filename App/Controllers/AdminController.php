@@ -5,6 +5,9 @@ namespace App\Controllers;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
 use Framework\Http\Responses\Response;
+use App\Models\Recipe;
+use App\Models\Ingredient;
+use App\Models\User;
 
 /**
  * Class AdminController
@@ -39,6 +42,11 @@ class AdminController extends BaseController
      */
     public function index(Request $request): Response
     {
-        return $this->html();
+        // Fetch counts from models and pass to the view
+        $recipesCount = Recipe::getCount();
+        $ingredientsCount = Ingredient::getCount();
+        $usersCount = User::getCount();
+
+        return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount'));
     }
 }
