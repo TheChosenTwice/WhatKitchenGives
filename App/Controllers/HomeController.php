@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Ingredient;
 use App\Models\Recipe;
+use App\Models\Category;
 use Exception;
 use Framework\Core\BaseController;
 use Framework\Http\Request;
@@ -60,7 +61,54 @@ class HomeController extends BaseController
 
     public function homePage(): Response
     {
-        return $this->html();
+        // Build pools: categoryName => array of ['id'=>int,'name'=>string]
+        $pools = [];
+        try {
+            $categories = Category::getAll(null, [], 'name ASC', null, null);
+            foreach ($categories as $cat) {
+                $catId = method_exists($cat, 'getId') ? $cat->getId() : null;
+                $items = [];
+                if ($catId !== null) {
+                    $ings = Ingredient::getAll('category_id = ?', [$catId], 'name ASC', null, null);
+                    foreach ($ings as $ing) {
+                        $items[] = [
+                            'id' => method_exists($ing, 'getId') ? $ing->getId() : null,
+                            'name' => method_exists($ing, 'getName') ? $ing->getName() : '',
+                        ];
+                    }
+                }
+                $pools[method_exists($cat, 'getName') ? $cat->getName() : ''] = $items;
+            }
+
+            // Include uncategorized ingredients (category_id IS NULL) if any
+            $uncat = Ingredient::getAll('category_id IS NULL', [], 'name ASC', null, null);
+            if (!empty($uncat)) {
+                $items = [];
+                foreach ($uncat as $ing) {
+                    $items[] = [
+                        'id' => method_exists($ing, 'getId') ? $ing->getId() : null,
+                        'name' => method_exists($ing, 'getName') ? $ing->getName() : '',
+                    ];
+                }
+                $pools['Uncategorized'] = $items;
+            }
+        } catch (\Throwable $e) {
+            // If DB is not available yet (e.g., before migrations), keep pools empty.
+            $pools = [];
+        }
+
+        // Map ingredient name => id for quick lookup in JS (fallback: raw query)
+        $ingredientIdByName = [];
+        try {
+            $rows = Ingredient::executeRawSQL('SELECT `id`, `name` FROM `ingredients`');
+            foreach ($rows as $r) {
+                $ingredientIdByName[(string)$r['name']] = (int)$r['id'];
+            }
+        } catch (\Throwable $e) {
+            $ingredientIdByName = [];
+        }
+
+        return $this->html(compact('pools', 'ingredientIdByName'));
     }
 
     /**

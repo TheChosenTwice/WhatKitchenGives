@@ -4,15 +4,24 @@
 use App\Models\Ingredient;
 use Framework\Support\LinkGenerator;
 
-// Load ingredient IDs for all ingredient names used on this page.
-$ingredientIdByName = [];
-try {
-    $rows = Ingredient::executeRawSQL('SELECT `id`, `name` FROM `ingredients`');
-    foreach ($rows as $r) {
-        $ingredientIdByName[(string)$r['name']] = (int)$r['id'];
+// Expect controller-provided data: $pools (category => list of items) and $ingredientIdByName (name=>id map)
+// Normalize pools coming from controller: ensure each item is ['id'=>..., 'name'=>...]
+$pools = $pools ?? [];
+foreach ($pools as $k => $items) {
+    $normalized = [];
+    foreach ($items as $it) {
+        if (is_array($it)) {
+            $normalized[] = ['id' => $it['id'] ?? null, 'name' => (string)($it['name'] ?? '')];
+        } else {
+            $normalized[] = ['id' => null, 'name' => (string)$it];
+        }
     }
-} catch (\Throwable) {
-    // If DB is not available yet (e.g., before migrations), keep IDs empty.
+    $pools[$k] = $normalized;
+}
+
+// Ensure ingredientIdByName is at least an empty array if controller omitted it
+if (!isset($ingredientIdByName) || !is_array($ingredientIdByName)) {
+    $ingredientIdByName = [];
 }
 ?>
 
@@ -35,84 +44,8 @@ try {
         <div class="home-page__ingredients-layout">
             <div class="home-page__ingredients-left" aria-label="All ingredients">
                 <?php
-                $pools = [
-                    'Fruits' => [
-                        'Apples',
-                        'Pears',
-                        'Bananas',
-                        'Lemons',
-                    ],
-                    'Vegetables' => [
-                        'Tomatoes',
-                        'Potatoes',
-                        'Onions',
-                        'Garlic',
-                        'Carrots',
-                        'Bell Peppers',
-                        'Broccoli',
-                        'Cauliflower',
-                        'Mushrooms',
-                        'Zucchini',
-                        'Cucumber',
-                        'Salad / Lettuce',
-                    ],
-                    'Dairy & Eggs' => [
-                        'Eggs',
-                        'Milk',
-                        'Butter',
-                        'Cheddar Cheese',
-                        'Cream Cheese',
-                        'Yogurt',
-                    ],
-                    'Meat & Fish' => [
-                        'Chicken Breast',
-                        'Chicken (in General)',
-                        'Ground Beef',
-                        'Pork',
-                        'Fish (in General)',
-                        'Bacon',
-                    ],
-                    'Pantry / Baking / Spices & Condiments' => [
-                        'Flour',
-                        'Sugar',
-                        'Brown Sugar',
-                        'Salt',
-                        'Black Pepper',
-                        'Olive Oil',
-                        'Vegetable Oil',
-                        'Vinegar',
-                        'Baking Powder',
-                        'Baking Soda',
-                        'Bread (in General)',
-                        'Rice',
-                        'Pasta',
-                        'Tortillas',
-                        'Ketchup',
-                        'Mayonnaise',
-                        'Mustard',
-                        'Soy Sauce',
-                        'Hot Sauce',
-                        'Chicken Broth / Stock',
-                        'Tomato Sauce / Passata',
-                        'Canned Tomatoes',
-                        'Beans (canned)',
-                        'Oregano',
-                        'Basil',
-                        'Paprika',
-                        'Cinnamon',
-                        'Garlic Powder',
-                        'Onion Powder',
-                    ],
-                ];
-
-                // Sort each pool alphabetically for nicer scanning.
+                // Pools already normalized above: each $items is an array of ['id'=>int|null, 'name'=>string]
                 foreach ($pools as $poolName => $items) {
-                    natcasesort($items);
-                    $pools[$poolName] = array_values($items);
-                }
-                ?>
-
-                <?php foreach ($pools as $poolName => $items) {
                     $poolId = 'pool_' . preg_replace('/[^a-z0-9]+/i', '_', strtolower($poolName));
                     $visibleCount = 9;
                     ?>
@@ -134,10 +67,12 @@ try {
                         </div>
 
                         <ul class="ingredients-grid list-unstyled" id="<?= $poolId ?>_grid">
-                            <?php foreach ($items as $idx => $name) {
+                            <?php foreach ($items as $idx => $item) {
+                                $name = isset($item['name']) ? $item['name'] : (string)$item;
                                 $safeName = htmlspecialchars($name, ENT_QUOTES);
                                 $isHidden = $idx >= $visibleCount;
-                                $ingredientId = $ingredientIdByName[$name] ?? null;
+                                // Prefer id provided by controller; fallback to ingredientIdByName mapping by name
+                                $ingredientId = isset($item['id']) && $item['id'] !== null ? (int)$item['id'] : ($ingredientIdByName[$name] ?? null);
                                 ?>
                                 <li class="ingredients-grid__item" <?= $isHidden ? 'data-pool-hidden hidden' : '' ?>>
                                     <button
