@@ -126,8 +126,7 @@
                                                         <td><?= htmlspecialchars((string)$category) ?></td>
                                                         <td><?= $time !== null ? htmlspecialchars((string)($time . ' min')) : '' ?></td>
                                                         <td>
-                                                            <button class="btn btn-sm btn-outline-primary">Edit</button>
-                                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger admin-delete" data-type="recipe" data-id="<?= (int)$id ?>">Delete</button>
                                                         </td>
                                                     </tr>
                                                 <?php } ?>
@@ -233,8 +232,7 @@
                                                         <td><?= htmlspecialchars((string)$iname) ?></td>
                                                         <td><?= htmlspecialchars((string)$icategory) ?></td>
                                                         <td>
-                                                            <button class="btn btn-sm btn-outline-primary">Edit</button>
-                                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger admin-delete" data-type="ingredient" data-id="<?= (int)$iid ?>">Delete</button>
                                                         </td>
                                                     </tr>
                                                 <?php } ?>
@@ -331,8 +329,7 @@
                                                         <td><?= $ureg ? htmlspecialchars((string)$ureg) : '' ?></td>
                                                         <td><?= htmlspecialchars((string)$urole) ?></td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-outline-primary btn-edit-user">Edit</button>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-user">Delete</button>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger admin-delete" data-type="user" data-id="<?= (int)$uid ?>">Delete</button>
                                                         </td>
                                                     </tr>
                                                 <?php } ?>
@@ -415,3 +412,30 @@
         });
     })();
 </script>
+
+<script>
+    // Attach delete handlers for recipes, ingredients and users
+    (function () {
+        if (typeof document === 'undefined') return;
+        document.addEventListener('DOMContentLoaded', function () {
+            var deleteUrl = '<?= $link->url("admin.delete") ?>';
+            document.querySelectorAll('button.admin-delete').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var type = btn.getAttribute('data-type');
+                    var id = parseInt(btn.getAttribute('data-id'), 10);
+                    if (!type || !isFinite(id) || id <= 0) return alert('Invalid item');
+                    if (!confirm('Delete ' + type + ' #' + id + '?')) return;
+                    btn.disabled = true;
+                    fetch(deleteUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ type: type, id: id }) })
+                        .then(r => r.json())
+                        .then(j => {
+                            if (j && j.success) { btn.closest('tr')?.remove(); } else { alert(j?.error || 'Failed to delete'); btn.disabled = false; }
+                        }).catch(function () { alert('Network error'); btn.disabled = false; });
+                });
+            });
+        });
+    })();
+</script>
+
+<?php
+

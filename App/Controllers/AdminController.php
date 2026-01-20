@@ -67,20 +67,48 @@ class AdminController extends BaseController
         $ingredientsCount = Ingredient::getCount();
         $usersCount = User::getCount();
 
-        // Fetch a page of recipes for the admin list (model instances)
-        // Show latest 100 ordered by title
-        // Order by id so the '#' column reflects DB id order
+        // Fetch items for admin lists
         $recipes = Recipe::getAll(null, [], 'id ASC', 100, 0);
-
-        // Fetch a page of ingredients ordered by id ascending for the admin list
         $ingredients = Ingredient::getAll(null, [], 'id ASC', 200, 0);
-
-        // Fetch categories for the ingredient editor (visual)
         $categories = Category::getAll(null, [], 'name ASC', 200, 0);
-
-        // Fetch a page of users ordered by id ascending for the admin list
         $users = User::getAll(null, [], 'id ASC', 200, 0);
 
         return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount', 'recipes', 'ingredients', 'users', 'categories'));
     }
+
+    /**
+     * Generic delete endpoint for admin items.
+     * Expects POST or GET with 'type' (recipe|ingredient|user) and 'id'.
+     */
+    public function delete(Request $request)
+    {
+        $type = (string)$request->value('type');
+        $id = (int)$request->value('id');
+        if ($id <= 0) {
+            return $this->json(['success' => false, 'error' => 'Invalid id']);
+        }
+
+        switch ($type) {
+            case 'recipe':
+                $model = Recipe::getOne($id);
+                break;
+            case 'ingredient':
+                $model = Ingredient::getOne($id);
+                break;
+            case 'user':
+                $model = User::getOne($id);
+                break;
+            default:
+                return $this->json(['success' => false, 'error' => 'Invalid type']);
+        }
+
+        if ($model === null) {
+            return $this->json(['success' => false, 'error' => ucfirst($type) . ' not found']);
+        }
+
+        // Let global error handler surface exceptions (keep code short)
+        $model->delete();
+        return $this->json(['success' => true, 'id' => $id]);
+    }
+
 }
