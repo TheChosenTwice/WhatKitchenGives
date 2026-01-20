@@ -13,6 +13,8 @@ class User extends Model implements IIdentity
     protected ?string $email = null;
     protected string $password_hash;
     protected ?string $created_at = null;
+    // New role column added in DB; provide property with default to avoid inserting NULL and overriding DB default
+    protected string $role = 'USER';
 
     // Getters and setters
     public function getId(): ?int
@@ -62,5 +64,16 @@ class User extends Model implements IIdentity
     public function getCreatedAt(): ?string
     {
         return $this->created_at;
+    }
+
+    // Accessors for role
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
     }
 }

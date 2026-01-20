@@ -30,7 +30,26 @@ class AdminController extends BaseController
      */
     public function authorize(Request $request, string $action): bool
     {
-        return $this->user->isLoggedIn();
+        // Not logged in -> let the framework redirect to login
+        if (!$this->user->isLoggedIn()) {
+            return false;
+        }
+
+        // Logged in but not admin -> redirect to home page
+        try {
+            $role = $this->user->getRole();
+        } catch (\Throwable $e) {
+            // If identity doesn't have getRole, deny access and redirect
+            $this->redirect($this->url('home.homePage'))->send();
+            return false;
+        }
+
+        if ($role !== 'ADMIN') {
+            $this->redirect($this->url('home.homePage'))->send();
+            return false;
+        }
+
+        return true;
     }
 
     /**
