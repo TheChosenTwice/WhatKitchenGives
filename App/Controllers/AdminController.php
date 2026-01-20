@@ -47,6 +47,14 @@ class AdminController extends BaseController
         $ingredientsCount = Ingredient::getCount();
         $usersCount = User::getCount();
 
-        return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount'));
+        // Fetch a page of recipes for the admin list (model instances)
+        // Show latest 100 ordered by title
+        // Order by id so the '#' column reflects DB id order
+        $recipes = Recipe::getAll(null, [], 'id ASC', 100, 0);
+
+        // Fetch a page of ingredients ordered by id ascending for the admin list
+        $ingredients = Ingredient::getAll(null, [], 'id ASC', 200, 0);
+
+        return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount', 'recipes', 'ingredients'));
     }
 }

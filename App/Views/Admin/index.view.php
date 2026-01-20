@@ -2,6 +2,8 @@
 
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \Framework\Auth\AppUser $user */
+/** @var \App\Models\Recipe[] $recipes */
+/** @var \App\Models\Ingredient[] $ingredients */
 
 ?>
 
@@ -102,28 +104,31 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td>1</td>
-                                                <td>Classic Pancakes</td>
-                                                <td>Breakfast</td>
-                                                <td>20 min</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
-                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Tomato Pasta</td>
-                                                <td>Dinner</td>
-                                                <td>30 min</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
-                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                                </td>
-                                            </tr>
-                                            <!-- Placeholder rows -->
-                                            </tbody>
+                                            <?php if (!empty($recipes)) { ?>
+                                                <?php foreach ($recipes as $idx => $r) {
+                                                    // $r is an instance of App\Models\Recipe
+                                                    $id = method_exists($r, 'getId') ? $r->getId() : null;
+                                                    $title = method_exists($r, 'getTitle') ? $r->getTitle() : '';
+                                                    $category = method_exists($r, 'getCategory') ? $r->getCategory() : '';
+                                                    $time = method_exists($r, 'getCookingTime') ? $r->getCookingTime() : null;
+                                                ?>
+                                                    <tr>
+                                                        <td><?= htmlspecialchars((int)$id) ?></td>
+                                                        <td><?= htmlspecialchars($title) ?></td>
+                                                        <td><?= htmlspecialchars((string)$category) ?></td>
+                                                        <td><?= $time !== null ? htmlspecialchars($time . ' min') : '' ?></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                <?php } ?>
+                                            <?php } else { ?>
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted">No recipes found.</td>
+                                                </tr>
+                                            <?php } ?>
+                                         </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -178,23 +183,26 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td>1</td>
-                                                <td>Flour</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
-                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Eggs</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
-                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                                </td>
-                                            </tr>
-                                            </tbody>
+                                            <?php if (!empty($ingredients)) { ?>
+                                                <?php foreach ($ingredients as $ing) {
+                                                    $iid = method_exists($ing, 'getId') ? $ing->getId() : null;
+                                                    $iname = method_exists($ing, 'getName') ? $ing->getName() : '';
+                                                ?>
+                                                    <tr>
+                                                        <td><?= htmlspecialchars((int)$iid) ?></td>
+                                                        <td><?= htmlspecialchars($iname) ?></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                <?php } ?>
+                                            <?php } else { ?>
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">No ingredients found.</td>
+                                                </tr>
+                                            <?php } ?>
+                                         </tbody>
                                         </table>
                                     </div>
                                 </div>
