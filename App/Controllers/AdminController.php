@@ -113,31 +113,31 @@ class AdminController extends BaseController
 
     /**
      * Generic save/update endpoint for admin items.
-     * Expects POST data with 'type' and 'id' and properties matching model fields.
+     * Expects POST data with 'type' and optional 'id' and properties matching model fields.
      */
     public function save(Request $request)
     {
         $type = (string)$request->value('type');
-        $id = (int)$request->value('id');
-        if ($id <= 0) {
-            return $this->json(['success' => false, 'error' => 'Invalid id']);
-        }
+        // Accept missing or zero id as create request
+        $rawId = $request->value('id');
+        $hasId = $rawId !== null && $rawId !== '' && ((int)$rawId > 0);
+        $id = $hasId ? (int)$rawId : null;
 
         switch ($type) {
             case 'recipe':
-                $model = Recipe::getOne($id);
+                $model = $hasId ? Recipe::getOne($id) : new Recipe();
                 break;
             case 'ingredient':
-                $model = Ingredient::getOne($id);
+                $model = $hasId ? Ingredient::getOne($id) : new Ingredient();
                 break;
             case 'user':
-                $model = User::getOne($id);
+                $model = $hasId ? User::getOne($id) : new User();
                 break;
             default:
                 return $this->json(['success' => false, 'error' => 'Invalid type']);
         }
 
-        if ($model === null) {
+        if ($hasId && $model === null) {
             return $this->json(['success' => false, 'error' => ucfirst($type) . ' not found']);
         }
 
