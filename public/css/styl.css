@@ -245,3 +245,22 @@
 
 /* Make the header area slightly darker to match */
 .admin-header { background: rgba(0,0,0,0.03); padding: 0.75rem; border-radius: 6px; }
+
+/* Admin small improvements */
+.admin-search .input-group-text { background: transparent; border-right: 0; }
+.admin-search .admin-search-input { border-left: 0; }
+
+.admin-panel .table-hover tbody tr:hover { background: rgba(0,0,0,0.03); }
+.admin-panel table.table td, .admin-panel table.table th { vertical-align: middle; }
+.admin-panel table.table tbody tr.table-active { background: rgba(133,184,107,0.12); }
+
+/* Smaller buttons in admin cards for compactness */
+.admin-panel .btn-sm { padding: .25rem .5rem; font-size: .825rem; }
+
+/* Ensure consistent card header spacing */
+.admin-panel .card .card-header { display:flex; align-items:center; justify-content:space-between; }
+
+/* Slightly reduce search input width on small screens */
+@media (max-width: 576px) {
+    .admin-search { width: 100% !important; }
+}

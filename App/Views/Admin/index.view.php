@@ -96,12 +96,15 @@
                                     <div>All Recipes</div>
                                     <div style="width:260px;">
                                         <label class="visually-hidden" for="recipes-search">Search recipes</label>
-                                        <input id="recipes-search" type="search" class="form-control form-control-sm" placeholder="Search recipes...">
+                                        <div class="input-group input-group-sm admin-search" role="search">
+                                            <span class="input-group-text">🔍</span>
+                                            <input id="recipes-search" type="search" class="form-control form-control-sm admin-search-input" placeholder="Search recipes...">
+                                        </div>
                                     </div>
                                 </div>
                                  <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-striped mb-0">
+                                        <table class="table table-striped table-hover mb-0">
                                             <thead>
                                             <tr>
                                                 <th>#</th>
@@ -188,7 +191,7 @@
                                         </div>
 
                                         <div class="d-grid">
-                                            <button type="button" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-primary btn-sm">Save</button>
                                         </div>
                                     </form>
                                 </div>
@@ -206,12 +209,15 @@
                                     <div>All Ingredients</div>
                                     <div style="width:260px;">
                                         <label class="visually-hidden" for="ingredients-search">Search ingredients</label>
-                                        <input id="ingredients-search" type="search" class="form-control form-control-sm" placeholder="Search ingredients...">
+                                        <div class="input-group input-group-sm admin-search" role="search">
+                                            <span class="input-group-text">🔍</span>
+                                            <input id="ingredients-search" type="search" class="form-control form-control-sm admin-search-input" placeholder="Search ingredients...">
+                                        </div>
                                     </div>
                                 </div>
                                  <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-striped mb-0">
+                                        <table class="table table-striped table-hover mb-0">
                                             <thead>
                                             <tr>
                                                 <th>#</th>
@@ -274,7 +280,7 @@
                                         </div>
 
                                         <div class="d-grid">
-                                            <button type="button" class="btn btn-success">Save</button>
+                                            <button type="button" class="btn btn-success btn-sm">Save</button>
                                         </div>
                                     </form>
                                 </div>
@@ -292,12 +298,15 @@
                                     <div>All Users</div>
                                     <div style="width:260px;">
                                         <label class="visually-hidden" for="users-search">Search users</label>
-                                        <input id="users-search" type="search" class="form-control form-control-sm" placeholder="Search users...">
+                                        <div class="input-group input-group-sm admin-search" role="search">
+                                            <span class="input-group-text">🔍</span>
+                                            <input id="users-search" type="search" class="form-control form-control-sm admin-search-input" placeholder="Search users...">
+                                        </div>
                                     </div>
                                 </div>
                                  <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-striped mb-0">
+                                        <table class="table table-striped table-hover mb-0">
                                             <thead>
                                             <tr>
                                                 <th>#</th>
@@ -370,7 +379,7 @@
                                             <input id="user-password" class="form-control" type="password" placeholder="Password (leave empty to keep)">
                                         </div>
                                         <div class="d-grid">
-                                            <button type="button" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-primary btn-sm">Save</button>
                                         </div>
                                     </form>
                                 </div>
