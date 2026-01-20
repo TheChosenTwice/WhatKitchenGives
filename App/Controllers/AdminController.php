@@ -8,6 +8,7 @@ use Framework\Http\Responses\Response;
 use App\Models\Recipe;
 use App\Models\Ingredient;
 use App\Models\User;
+use App\Models\Category;
 
 /**
  * Class AdminController
@@ -74,9 +75,12 @@ class AdminController extends BaseController
         // Fetch a page of ingredients ordered by id ascending for the admin list
         $ingredients = Ingredient::getAll(null, [], 'id ASC', 200, 0);
 
+        // Fetch categories for the ingredient editor (visual)
+        $categories = Category::getAll(null, [], 'name ASC', 200, 0);
+
         // Fetch a page of users ordered by id ascending for the admin list
         $users = User::getAll(null, [], 'id ASC', 200, 0);
 
-        return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount', 'recipes', 'ingredients', 'users'));
+        return $this->html(compact('recipesCount', 'ingredientsCount', 'usersCount', 'recipes', 'ingredients', 'users', 'categories'));
     }
 }

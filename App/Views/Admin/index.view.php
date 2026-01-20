@@ -5,6 +5,7 @@
 /** @var \App\Models\Recipe[] $recipes */
 /** @var \App\Models\Ingredient[] $ingredients */
 /** @var \App\Models\User[] $users */
+/** @var \App\Models\Category[] $categories */
 
 ?>
 
@@ -216,6 +217,7 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Name</th>
+                                                <th>Category</th>
                                                 <th>Actions</th>
                                             </tr>
                                             </thead>
@@ -224,10 +226,12 @@
                                                 <?php foreach ($ingredients as $ing) {
                                                     $iid = method_exists($ing, 'getId') ? $ing->getId() : null;
                                                     $iname = method_exists($ing, 'getName') ? $ing->getName() : '';
+                                                    $icategory = method_exists($ing, 'getCategory') ? $ing->getCategory() : '';
                                                 ?>
                                                     <tr>
                                                         <td><?= htmlspecialchars((int)$iid) ?></td>
                                                         <td><?= htmlspecialchars((string)$iname) ?></td>
+                                                        <td><?= htmlspecialchars((string)$icategory) ?></td>
                                                         <td>
                                                             <button class="btn btn-sm btn-outline-primary">Edit</button>
                                                             <button class="btn btn-sm btn-outline-danger">Delete</button>
@@ -236,7 +240,7 @@
                                                 <?php } ?>
                                             <?php } else { ?>
                                                 <tr>
-                                                    <td colspan="3" class="text-center text-muted">No ingredients found.</td>
+                                                    <td colspan="4" class="text-center text-muted">No ingredients found.</td>
                                                 </tr>
                                             <?php } ?>
                                          </tbody>
@@ -255,6 +259,22 @@
                                             <label class="form-label" for="ingredient-name">Name</label>
                                             <input id="ingredient-name" class="form-control" type="text" placeholder="Ingredient name">
                                         </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label" for="ingredient-category">Category</label>
+                                            <select id="ingredient-category" class="form-select">
+                                                <option value="">Select category</option>
+                                                <?php if (!empty($categories)) { ?>
+                                                    <?php foreach ($categories as $category) {
+                                                        $cid = method_exists($category, 'getId') ? $category->getId() : null;
+                                                        $cname = method_exists($category, 'getName') ? $category->getName() : '';
+                                                    ?>
+                                                        <option value="<?= htmlspecialchars((int)$cid) ?>"><?= htmlspecialchars((string)$cname) ?></option>
+                                                    <?php } ?>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+
                                         <div class="d-grid">
                                             <button type="button" class="btn btn-success">Save</button>
                                         </div>
