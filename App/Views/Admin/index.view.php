@@ -200,7 +200,7 @@
                 <!-- Ingredients Tab -->
                 <div class="tab-pane fade" id="ingredients" role="tabpanel" aria-labelledby="ingredients-tab">
                     <div class="row">
-                        <div class="col-lg-7 mb-3">
+                        <div class="col-lg-8 mb-3">
                             <div id="all-ingredients" class="card">
                                 <div class="card-header d-flex align-items-center justify-content-between">
                                     <div>All Ingredients</div>
@@ -211,7 +211,7 @@
                                 </div>
                                  <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
+                                        <table class="table table-striped mb-0">
                                             <thead>
                                             <tr>
                                                 <th>#</th>
@@ -248,7 +248,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-5 mb-3">
+                        <div class="col-lg-4 mb-3">
                             <div id="add-ingredient" class="card">
                                 <div class="card-header">Add / Edit Ingredient</div>
                                 <div class="card-body">
@@ -286,7 +286,7 @@
                 <!-- Users Tab (two-column: list + Add/Edit panel) -->
                 <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
                     <div class="row">
-                        <div class="col-lg-7 mb-3">
+                        <div class="col-lg-8 mb-3">
                             <div id="all-users" class="card">
                                 <div class="card-header d-flex align-items-center justify-content-between">
                                     <div>All Users</div>
@@ -345,7 +345,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-5 mb-3">
+                        <div class="col-lg-4 mb-3">
                             <div id="add-user" class="card">
                                 <div class="card-header">Add / Edit User</div>
                                 <div class="card-body">
