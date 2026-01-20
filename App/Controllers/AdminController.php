@@ -111,4 +111,57 @@ class AdminController extends BaseController
         return $this->json(['success' => true, 'id' => $id]);
     }
 
+    /**
+     * Generic save/update endpoint for admin items.
+     * Expects POST data with 'type' and 'id' and properties matching model fields.
+     */
+    public function save(Request $request)
+    {
+        $type = (string)$request->value('type');
+        $id = (int)$request->value('id');
+        if ($id <= 0) {
+            return $this->json(['success' => false, 'error' => 'Invalid id']);
+        }
+
+        switch ($type) {
+            case 'recipe':
+                $model = Recipe::getOne($id);
+                break;
+            case 'ingredient':
+                $model = Ingredient::getOne($id);
+                break;
+            case 'user':
+                $model = User::getOne($id);
+                break;
+            default:
+                return $this->json(['success' => false, 'error' => 'Invalid type']);
+        }
+
+        if ($model === null) {
+            return $this->json(['success' => false, 'error' => ucfirst($type) . ' not found']);
+        }
+
+        // For users we need to treat password specially (model exposes setPassword)
+        if ($type === 'user') {
+            // Apply simple setters if available
+            $username = $request->value('username');
+            $email = $request->value('email');
+            $role = $request->value('role');
+            $password = $request->value('password');
+
+            if ($username !== null && method_exists($model, 'setUsername')) { $model->setUsername((string)$username); }
+            if ($email !== null && method_exists($model, 'setEmail')) { $model->setEmail($email === '' ? null : (string)$email); }
+            if ($role !== null && method_exists($model, 'setRole')) { $model->setRole((string)$role); }
+            if ($password !== null && $password !== '') { $model->setPassword((string)$password); }
+
+            $model->save();
+            return $this->json(['success' => true, 'model' => $model]);
+        }
+
+        // For other models we can rely on setFromRequest to map request keys to properties
+        $model->setFromRequest($request);
+        $model->save();
+        return $this->json(['success' => true, 'model' => $model]);
+    }
+
 }

@@ -541,5 +541,110 @@
     })();
 </script>
 
+<script>
+    // Attach save handlers for the edit panels
+    (function () {
+        if (typeof document === 'undefined') return;
+        document.addEventListener('DOMContentLoaded', function () {
+            var saveUrl = '<?= $link->url("admin.save") ?>';
+
+            // Recipes save
+            var recipeSaveBtn = document.querySelector('#adminRecipeForm button.btn-primary');
+            if (recipeSaveBtn) recipeSaveBtn.addEventListener('click', function () {
+                var titleEl = document.getElementById('recipe-title');
+                var catEl = document.getElementById('recipe-category');
+                var instrEl = document.getElementById('recipe-instructions');
+                var timeEl = document.getElementById('recipe-preptime');
+                var servingEl = document.getElementById('recipe-serving-size');
+                var imgEl = document.getElementById('recipe-image');
+                // Find selected row id
+                var sel = document.querySelector('#recipes tbody tr.table-active');
+                if (!sel) return alert('Select a recipe row first');
+                var id = sel.getAttribute('data-id');
+                var payload = new URLSearchParams({ type: 'recipe', id: id });
+                if (titleEl) payload.set('title', titleEl.value);
+                if (instrEl) payload.set('instructions', instrEl.value);
+                if (catEl) payload.set('category', catEl.value);
+                if (timeEl) payload.set('cooking_time', timeEl.value);
+                if (servingEl) payload.set('serving_size', servingEl.value);
+                if (imgEl) payload.set('image', imgEl.value);
+                fetch(saveUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload })
+                    .then(r => r.json())
+                    .then(j => {
+                        if (j && j.success) {
+                            alert('Recipe saved');
+                            // Update row attributes and visible cells
+                            sel.setAttribute('data-title', titleEl.value);
+                            sel.setAttribute('data-category', catEl.value);
+                            sel.setAttribute('data-time', timeEl.value);
+                            sel.setAttribute('data-serving', servingEl.value);
+                            sel.setAttribute('data-image', imgEl.value);
+                            sel.setAttribute('data-instructions', instrEl.value);
+                            // update displayed cells: title and category and time
+                            sel.querySelector('td:nth-child(2)').textContent = titleEl.value;
+                            sel.querySelector('td:nth-child(3)').textContent = catEl.value;
+                            sel.querySelector('td:nth-child(4)').textContent = (timeEl.value ? (timeEl.value + ' min') : '');
+                        } else {
+                            alert(j?.error || 'Failed to save');
+                        }
+                    }).catch(function () { alert('Network error'); });
+            });
+
+            // Ingredients save
+            var ingSaveBtn = document.querySelector('#add-ingredient button.btn-success');
+            if (ingSaveBtn) ingSaveBtn.addEventListener('click', function () {
+                var nameEl = document.getElementById('ingredient-name');
+                var catEl = document.getElementById('ingredient-category');
+                var sel = document.querySelector('#ingredients tbody tr.table-active');
+                if (!sel) return alert('Select an ingredient row first');
+                var id = sel.getAttribute('data-id');
+                var payload = new URLSearchParams({ type: 'ingredient', id: id });
+                if (nameEl) payload.set('name', nameEl.value);
+                if (catEl) payload.set('category_id', catEl.value);
+                fetch(saveUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload })
+                    .then(r => r.json())
+                    .then(j => {
+                        if (j && j.success) {
+                            alert('Ingredient saved');
+                            sel.setAttribute('data-name', nameEl.value);
+                            sel.setAttribute('data-category', catEl.options[catEl.selectedIndex].text);
+                            sel.querySelector('td:nth-child(2)').textContent = nameEl.value;
+                            sel.querySelector('td:nth-child(3)').textContent = catEl.options[catEl.selectedIndex].text;
+                        } else { alert(j?.error || 'Failed to save'); }
+                    }).catch(function () { alert('Network error'); });
+            });
+
+            // Users save
+            var userSaveBtn = document.querySelector('#adminUserForm button.btn-primary');
+            if (userSaveBtn) userSaveBtn.addEventListener('click', function () {
+                var uName = document.getElementById('user-username');
+                var uEmail = document.getElementById('user-email');
+                var uRole = document.getElementById('user-role');
+                var uPass = document.getElementById('user-password');
+                var sel = document.querySelector('#users tbody tr.table-active');
+                if (!sel) return alert('Select a user row first');
+                var id = sel.getAttribute('data-user-id');
+                var payload = new URLSearchParams({ type: 'user', id: id });
+                if (uName) payload.set('username', uName.value);
+                if (uEmail) payload.set('email', uEmail.value);
+                if (uRole) payload.set('role', uRole.value);
+                if (uPass && uPass.value) payload.set('password', uPass.value);
+                fetch(saveUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload })
+                    .then(r => r.json())
+                    .then(j => {
+                        if (j && j.success) {
+                            alert('User saved');
+                            sel.setAttribute('data-username', uName.value);
+                            sel.setAttribute('data-email', uEmail.value);
+                            sel.setAttribute('data-role', uRole.value);
+                            sel.querySelector('td:nth-child(2)').textContent = uName.value;
+                            sel.querySelector('td:nth-child(3)').textContent = uEmail.value;
+                        } else { alert(j?.error || 'Failed to save'); }
+                    }).catch(function () { alert('Network error'); });
+            });
+        });
+    })();
+</script>
+
 <?php
 
