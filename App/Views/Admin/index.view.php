@@ -91,8 +91,14 @@
                     <div class="row">
                         <div class="col-lg-8 mb-3">
                             <div id="all-recipes" class="card">
-                                <div class="card-header">All Recipes</div>
-                                <div class="card-body p-0">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <div>All Recipes</div>
+                                    <div style="width:260px;">
+                                        <label class="visually-hidden" for="recipes-search">Search recipes</label>
+                                        <input id="recipes-search" type="search" class="form-control form-control-sm" placeholder="Search recipes...">
+                                    </div>
+                                </div>
+                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table class="table table-striped mb-0">
                                             <thead>
@@ -140,23 +146,47 @@
                             <div id="add-recipe" class="card">
                                 <div class="card-header">Add / Edit Recipe</div>
                                 <div class="card-body">
-                                    <form>
+                                    <form id="adminRecipeForm" enctype="multipart/form-data">
                                         <div class="mb-2">
                                             <label class="form-label" for="recipe-title">Title</label>
                                             <input id="recipe-title" class="form-control" type="text" placeholder="Recipe title">
                                         </div>
+
                                         <div class="mb-2">
                                             <label class="form-label" for="recipe-category">Category</label>
                                             <input id="recipe-category" class="form-control" type="text" placeholder="Category">
                                         </div>
+
                                         <div class="mb-2">
-                                            <label class="form-label" for="recipe-preptime">Prep time</label>
-                                            <input id="recipe-preptime" class="form-control" type="text" placeholder="e.g. 30 min">
+                                            <label class="form-label" for="recipe-instructions">Instructions</label>
+                                            <textarea id="recipe-instructions" class="form-control" rows="6" placeholder="Step-by-step instructions (visual only)"></textarea>
                                         </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-6 mb-2">
+                                                <label class="form-label" for="recipe-preptime">Cooking time (minutes)</label>
+                                                <input id="recipe-preptime" class="form-control" type="number" min="0" placeholder="e.g. 30">
+                                            </div>
+                                            <div class="col-sm-6 mb-2">
+                                                <label class="form-label" for="recipe-serving-size">Serving size</label>
+                                                <input id="recipe-serving-size" class="form-control" type="number" min="1" placeholder="e.g. 4">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label" for="recipe-image">Image URL</label>
+                                            <input id="recipe-image" class="form-control" type="text" placeholder="Image URL or path (visual only)">
+                                            <small class="form-text text-muted">Paste an image URL to preview below (visual only).</small>
+                                            <div class="mt-2 text-center">
+                                                <img id="recipe-image-preview" src="<?= $link->asset('images/vaiicko_logo.png') ?>" alt="Preview" style="max-width:100%; max-height:160px; object-fit:contain; display:none;">
+                                            </div>
+                                        </div>
+
                                         <div class="mb-2">
                                             <label class="form-label" for="recipe-ingredients">Ingredients</label>
                                             <textarea id="recipe-ingredients" class="form-control" rows="3" placeholder="List ingredient IDs or names (visual only)"></textarea>
                                         </div>
+
                                         <div class="d-grid">
                                             <button type="button" class="btn btn-primary">Save</button>
                                         </div>
@@ -172,8 +202,14 @@
                     <div class="row">
                         <div class="col-lg-7 mb-3">
                             <div id="all-ingredients" class="card">
-                                <div class="card-header">All Ingredients</div>
-                                <div class="card-body p-0">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <div>All Ingredients</div>
+                                    <div style="width:260px;">
+                                        <label class="visually-hidden" for="ingredients-search">Search ingredients</label>
+                                        <input id="ingredients-search" type="search" class="form-control form-control-sm" placeholder="Search ingredients...">
+                                    </div>
+                                </div>
+                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table class="table table-hover mb-0">
                                             <thead>
@@ -234,8 +270,14 @@
                     <div class="row">
                         <div class="col-lg-7 mb-3">
                             <div id="all-users" class="card">
-                                <div class="card-header">All Users</div>
-                                <div class="card-body p-0">
+                                <div class="card-header d-flex align-items-center justify-content-between">
+                                    <div>All Users</div>
+                                    <div style="width:260px;">
+                                        <label class="visually-hidden" for="users-search">Search users</label>
+                                        <input id="users-search" type="search" class="form-control form-control-sm" placeholder="Search users...">
+                                    </div>
+                                </div>
+                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table class="table table-striped mb-0">
                                             <thead>
@@ -326,3 +368,30 @@
 </div>
 
 <!-- Admin styles have been migrated to public/css/styl.css -->
+
+<script>
+    // Small UX: show preview when an image URL is pasted/typed
+    (function () {
+        if (typeof document === 'undefined') return;
+        document.addEventListener('DOMContentLoaded', function () {
+            var imgInput = document.getElementById('recipe-image');
+            var imgPreview = document.getElementById('recipe-image-preview');
+            if (!imgInput || !imgPreview) return;
+            function updatePreview() {
+                var url = imgInput.value && imgInput.value.trim();
+                if (!url) {
+                    imgPreview.style.display = 'none';
+                    imgPreview.removeAttribute('src');
+                    return;
+                }
+                // optimistic set - if image fails to load we hide it
+                imgPreview.style.display = 'block';
+                imgPreview.src = url;
+                imgPreview.onerror = function () { imgPreview.style.display = 'none'; };
+            }
+            imgInput.addEventListener('input', updatePreview);
+            // set initial state if form prefilled
+            updatePreview();
+        });
+    })();
+</script>
