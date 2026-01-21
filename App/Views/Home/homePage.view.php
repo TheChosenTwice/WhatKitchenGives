@@ -1,4 +1,5 @@
 <?php
+// AI-generated: This file contains code generated with AI assistance.
 /** @var LinkGenerator $link */
 
 use App\Models\Ingredient;

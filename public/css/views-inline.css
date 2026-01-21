@@ -1,0 +1,8 @@
+/* Extracted view-specific styles moved here to avoid inline <style> blocks */
+
+/* simple heart button positioning used across multiple views */
+.card{ position:relative; }
+.favourite-btn{
+    position:absolute; right:12px; top:12px; z-index:10; border:0; background:transparent; font-size:20px; line-height:1; cursor:pointer;
+}
+.favourite-btn.added{ color:#e0245e; }

@@ -1,3 +1,4 @@
+// AI-generated: This file contains code generated with AI assistance.
 // Shared JavaScript for the app.
 // Keep page-specific logic behind DOM guards so this file can be included everywhere.
 

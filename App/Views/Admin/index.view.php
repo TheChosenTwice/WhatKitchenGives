@@ -1,4 +1,5 @@
 <?php
+// AI-generated: This file contains code generated with AI assistance.
 
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \Framework\Auth\AppUser $user */
@@ -108,7 +109,7 @@
                                             <tbody>
                                             <?php if (!empty($recipes)) { ?>
                                                 <?php foreach ($recipes as $idx => $r) {
-                                                    // $r is an instance of App\Models\Recipe
+                                                    // $r is an instance of App\\Models\\Recipe
                                                     $id = method_exists($r, 'getId') ? $r->getId() : null;
                                                     $title = method_exists($r, 'getTitle') ? $r->getTitle() : '';
                                                     $category = method_exists($r, 'getCategory') ? $r->getCategory() : '';

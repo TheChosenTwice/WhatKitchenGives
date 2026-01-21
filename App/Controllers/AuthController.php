@@ -1,4 +1,5 @@
 <?php
+// AI-generated: This file contains code generated with AI assistance.
 
 namespace App\Controllers;
 

@@ -19,7 +19,7 @@ class Configuration
     /**
      * Application name.
      */
-    public const APP_NAME = 'Vaííčko MVC FW';
+    public const APP_NAME = 'What Kitchen Gives';
 
     /**
      * Version of the framework.

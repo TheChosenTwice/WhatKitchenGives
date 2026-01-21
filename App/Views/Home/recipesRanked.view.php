@@ -68,14 +68,9 @@
     </div>
 </div>
 
-<style>
-/* simple heart button positioning */
-.card{ position:relative; }
-.favourite-btn{
-    position:absolute; right:12px; top:12px; z-index:10; border:0; background:transparent; font-size:20px; line-height:1; cursor:pointer;
-}
-.favourite-btn.added{ color:#e0245e; }
-</style>
+
+<!-- extracted CSS moved to public/css/views-inline.css -->
+<link rel="stylesheet" href="<?= $link->asset('css/views-inline.css') ?>">
 
 <script>
     // Bootstrap config for external favourite script

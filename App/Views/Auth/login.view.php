@@ -1,6 +1,7 @@
 <?php
+// AI-generated: This file contains code generated with AI assistance.
 
-/** @var string|null $message */
+ /** @var string|null $message */
 /** @var \Framework\Support\LinkGenerator $link */
 /** @var \Framework\Support\View $view */
 

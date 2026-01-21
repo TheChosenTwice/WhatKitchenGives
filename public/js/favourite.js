@@ -1,3 +1,4 @@
+// AI-generated: This file contains code generated with AI assistance.
 (function(){
     if (typeof document === 'undefined') return;
     document.addEventListener('DOMContentLoaded', function(){
