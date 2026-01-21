@@ -28,7 +28,7 @@
 <nav class="navbar navbar-expand-sm bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="<?= $link->url('home.index') ?>">
-            <img src="<?= $link->asset('images/vaiicko_logo.png') ?>" title="<?= App\Configuration::APP_NAME ?>" alt="Framework Logo">
+            <img src="<?= $link->asset('images/logo.png') ?>" title="<?= App\Configuration::APP_NAME ?>" alt="Framework Logo">
         </a>
         <?php if ($user->isLoggedIn()) { ?>
             <span class="navbar-text">Logged in user: <b><?= $user->getName() ?></b></span>

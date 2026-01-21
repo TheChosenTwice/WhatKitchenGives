@@ -27,7 +27,7 @@
     <div class="row mb-3 align-items-center admin-header">
         <div class="col-md-3 d-flex align-items-center">
             <a href="<?= $link->url('home.index') ?>">
-                <img src="<?= $link->asset('images/vaiicko_logo.png') ?>" alt="Logo" style="height:48px;"/>
+                <img src="<?= $link->asset('images/logo.png') ?>" alt="Logo" style="height:48px;"/>
             </a>
             <h4 class="ms-2 mb-0">Admin Panel</h4>
         </div>
@@ -182,7 +182,7 @@
                                             <input id="recipe-image" class="form-control" type="text" placeholder="Image URL or path (visual only)">
                                             <small class="form-text text-muted">Paste an image URL to preview below (visual only).</small>
                                             <div class="mt-2 text-center">
-                                                <img id="recipe-image-preview" src="<?= $link->asset('images/vaiicko_logo.png') ?>" alt="Preview" style="max-width:100%; max-height:160px; object-fit:contain; display:none;">
+                                                <img id="recipe-image-preview" src="<?= $link->asset('images/logo.png') ?>" alt="Preview" style="max-width:100%; max-height:160px; object-fit:contain; display:none;">
                                             </div>
                                         </div>
 
