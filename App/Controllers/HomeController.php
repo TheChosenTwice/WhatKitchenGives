@@ -46,19 +46,6 @@ class HomeController extends BaseController
         return $this->html();
     }
 
-    /**
-     * Displays the contact page.
-     *
-     * This action serves the HTML view for the contact page, which is accessible to all users without any
-     * authorization.
-     *
-     * @return Response The response object containing the rendered HTML for the contact page.
-     */
-    public function contact(Request $request): Response
-    {
-        return $this->html();
-    }
-
     public function homePage(): Response
     {
         // Build pools: categoryName => array of ['id'=>int,'name'=>string]
