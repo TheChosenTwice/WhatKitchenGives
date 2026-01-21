@@ -43,10 +43,11 @@ class HomeController extends BaseController
      */
     public function index(Request $request): Response
     {
-        return $this->html();
+        // Delegate to the more feature-rich homePage action so visiting the root (localhost) shows the full app home.
+        return $this->homePage($request);
     }
 
-    public function homePage(): Response
+    public function homePage(Request $request): Response
     {
         // Build pools: categoryName => array of ['id'=>int,'name'=>string]
         $pools = [];
@@ -95,7 +96,8 @@ class HomeController extends BaseController
             $ingredientIdByName = [];
         }
 
-        return $this->html(compact('pools', 'ingredientIdByName'));
+        // Explicitly render the homePage view (router action may still be 'index' for root URL)
+        return $this->html(compact('pools', 'ingredientIdByName'), 'homePage');
     }
 
     /**
