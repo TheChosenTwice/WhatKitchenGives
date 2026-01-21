@@ -39,6 +39,7 @@
         </div>
         <div class="col-md-3 text-end">
             <span class="me-3">Signed in as <strong><?= $user->getName() ?></strong></span>
+            <a class="btn btn-outline-secondary btn-sm" href="<?= $link->url('favourite.index') ?>">Favourites</a>
             <a class="btn btn-outline-secondary btn-sm" href="<?= $link->url('auth.logout') ?>">Logout</a>
         </div>
     </div>
