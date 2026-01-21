@@ -78,46 +78,11 @@
 </style>
 
 <script>
-    (function(){
-        if (typeof document === 'undefined') return;
-        document.addEventListener('DOMContentLoaded', function(){
-            const idsUrl = '<?= $link->url("favourite.ids") ?>';
-            const toggleUrl = '<?= $link->url("favourite.toggle") ?>';
-
-            // Map of favourited recipe ids
-            let favSet = new Set();
-
-            function initButtons(){
-                document.querySelectorAll('.favourite-btn').forEach(btn => {
-                    const id = parseInt(btn.getAttribute('data-recipe-id'),10);
-                    if (favSet.has(id)) btn.classList.add('added');
-                    btn.addEventListener('click', function(e){
-                        e.stopPropagation();
-                        // POST to toggle
-                        fetch(toggleUrl, { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: new URLSearchParams({ recipe_id: id }) })
-                            .then(r => {
-                                // If we get redirected (login) the server will return 301; handle by checking r.redirected
-                                if (r.redirected) { window.location = r.url; return; }
-                                return r.json().catch(()=>null);
-                            })
-                            .then(j => {
-                                if (!j) return;
-                                if (j.success) {
-                                    if (j.added) { btn.classList.add('added'); favSet.add(id); }
-                                    else { btn.classList.remove('added'); favSet.delete(id); }
-                                } else if (j.error) {
-                                    alert(j.error);
-                                }
-                            }).catch(()=>{ alert('Network error'); });
-                    });
-                });
-            }
-
-            // Load ids only if the endpoint exists
-            fetch(idsUrl, { method: 'GET', headers: { 'Accept': 'application/json' } })
-                .then(r => r.json().catch(()=>null))
-                .then(j => { if (j && Array.isArray(j.ids)) { j.ids.forEach(i=>favSet.add(parseInt(i,10))); } })
-                .finally(()=>initButtons());
-        });
-    })();
+    // Bootstrap config for external favourite script
+    window.FavouriteConfig = {
+        idsUrl: '<?= $link->url("favourite.ids") ?>',
+        toggleUrl: '<?= $link->url("favourite.toggle") ?>'
+    };
 </script>
+
+<script src="<?= $link->asset('js/favourite.js') ?>" defer></script>
